@@ -1,0 +1,3 @@
+"""
+Kaggle Notebook用です
+"""
