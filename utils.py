@@ -68,8 +68,7 @@ class Feature(metaclass=ABCMeta):
         else:
             self.name = re.sub("([A-Z])", lambda x: "_" + x.group(1).lower(), self.__class__.__name__).lstrip('_')
 
-        # ユーザーに登録してもらう
-        # self.data = pd.read_pickle("../features_data/data.pkl")
+        # ユーザーに更新してもらう
         self.data = pd.DataFrame()
         self.data_path = Path(self.dir) / f"{self.name}.pkl"
 
@@ -132,22 +131,17 @@ def add_experiment_name(rand):
 
 def git_commits(rand):
     def func_decorator(my_func):
-        # print('--- my_decorator before decorator_wrapper ---')
         print("experiment_name: ", rand)
 
+        # リポジトリをきめる（今回だとotto2）
         repo = git.Repo(str(Path(os.getcwd()).parents[0]))
         repo.git.diff("HEAD")
         repo.git.add(".")
+        # commit
         repo.index.commit(f"{rand}(before running)")
 
         def decorator_wrapper(*args, **kwargs):
-            # print('--- decorator before my_func ---')
-            # print('args:{}'.format(args))
-            # print('kwargs:{}'.format(kwargs))
             my_func(*args, **kwargs)
-            # print('--- decorator after my_func ---\n')
-
-        # print('--- my_decorator after decorator_wrapper ---')
 
         repo.index.commit(f"{rand}(after running)")
         repo.git.push('origin', 'master')
@@ -156,17 +150,30 @@ def git_commits(rand):
     return func_decorator
 
 
-def kaggle_wrapper(func):
-    def wrapper(*args, **kwargs):
-        func(*args, **kwargs)
-        rand = args[0]
-        cwd = args[1]
-        cfg = args[2]
+def kaggle_wrapper(rand, cwd, cfg):
+    def func_decorator(my_func):
+        def decorator_wrapper(*args, **kwargs):
+            my_func(*args, **kwargs)
+
         add_experiment_name(rand=rand)
         add_datasets(rand)
         add_notebooks(rand, cwd, cfg)
 
-    return wrapper
+        return decorator_wrapper
+
+    return func_decorator
+
+# def kaggle_wrapper(func):
+#     def wrapper(*args, **kwargs):
+#         func(*args, **kwargs)
+#         rand = args[0]
+#         cwd = args[1]
+#         cfg = args[2]
+#         add_experiment_name(rand=rand)
+#         add_datasets(rand)
+#         add_notebooks(rand, cwd, cfg)
+#
+#     return wrapper
 
 
 def add_datasets(rand):

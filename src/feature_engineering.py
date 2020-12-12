@@ -3,11 +3,11 @@ from src.preprocess import base_data
 
 import pandas as pd
 import hydra
-import numpy as np
-from sklearn.model_selection import KFold
 from sklearn.decomposition import PCA
 
+# 生成された特徴量を保存するパス
 Feature.dir = "features"
+# trainとtestを結合して基本的な前処理を行ったデータを呼ぶ
 data = base_data()
 
 
@@ -26,6 +26,7 @@ class Pca(Feature):
                 columns=["train", "target", "id"]
             )
         )
+        # カラム名
         n_name = [f"pca_{i}" for i in range(n)]
         df_pca = pd.DataFrame(
             pca.transform(data.drop(
@@ -39,6 +40,8 @@ class Pca(Feature):
 
 @hydra.main(config_name="../config/config.yaml")
 def run(cfg):
+    # overwriteがfalseなら上書きはされない
+    # globals()からこのファイルの中にある特徴量クラスが選別されてそれぞれ実行される
     generate_features(globals(), cfg.base.overwrite)
 
 

@@ -108,7 +108,6 @@ def run(cfg):
 @hydra.main(config_name="../config/config.yaml")
 def main(cfg):
     run(cfg)
-    return None
 
 
 if __name__ == "__main__":
