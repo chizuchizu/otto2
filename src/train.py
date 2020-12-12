@@ -101,7 +101,7 @@ def run(cfg):
     ss.to_csv(file_path, index=False)
 
     mlflow.log_artifact(file_path)
-    os.system("kaggle competitions submit -c otto-group-product-classification-challenge -f submission.csv -m 'none'")
+    os.system(f"kaggle competitions submit -c otto-group-product-classification-challenge -f {file_path} -m 'none'")
 
 
 # @git_commits(rand)
@@ -111,4 +111,5 @@ def main(cfg):
     return None
 
 
-main()
+if __name__ == "__main__":
+    main()
