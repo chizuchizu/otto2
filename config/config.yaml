@@ -1,2 +1,20 @@
 base:
   overwrite: true
+  seed: 1234
+  n_folds: 4
+  optuna: false
+  num_boost_round: 1500
+
+parameters:
+  objective: "multiclass"
+  num_class: 9
+  max_depth: 8
+  learning_rate: .02
+  metric: "multi_logloss"
+  num_leaves: 31
+  verbose: -1
+
+features: [
+  "base_data",
+  "pca",
+]

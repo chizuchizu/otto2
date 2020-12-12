@@ -13,7 +13,7 @@ data = base_data()
 
 class Base_data(Feature):
     def create_features(self):
-        self.data = data.drop(columns=["train", "target"])
+        self.data = data.drop(columns=["id"])
         create_memo("base_data", "初期")
 
 

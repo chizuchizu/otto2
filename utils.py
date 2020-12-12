@@ -130,19 +130,55 @@ def add_experiment_name(rand):
         yaml.dump(data, f)
 
 
-def git_commits(func):
-    def wrapper(*args, **kwargs):
-        rand = args[0]
+def git_commits(rand):
+    def func_decorator(my_func):
+        # print('--- my_decorator before decorator_wrapper ---')
+        print("experiment_name: ", rand)
+
         repo = git.Repo("/home/yuma/PycharmProjects/cassava")
         repo.git.diff("HEAD")
         repo.git.add(".")
         repo.index.commit(f"{rand}(before running)")
-        func(*args, **kwargs)
+
+        def decorator_wrapper(*args, **kwargs):
+            # print('--- decorator before my_func ---')
+            # print('args:{}'.format(args))
+            # print('kwargs:{}'.format(kwargs))
+            my_func(*args, **kwargs)
+            # print('--- decorator after my_func ---\n')
+
+        # print('--- my_decorator after decorator_wrapper ---')
 
         repo.index.commit(f"{rand}(after running)")
         repo.git.push('origin', 'master')
+        return decorator_wrapper
 
-    return wrapper
+    return func_decorator
+
+
+# def git_commits(rand):
+#     repo = git.Repo("/home/yuma/PycharmProjects/cassava")
+#     repo.git.diff("HEAD")
+#     repo.git.add(".")
+#     repo.index.commit(f"{rand}(before running)")
+#
+#     repo.index.commit(f"{rand}(after running)")
+#     repo.git.push('origin', 'master')
+
+
+# def git_commits(func):
+#     def wrapper(*args, **kwargs):
+#         rand = args[0]
+#         repo = git.Repo("/home/yuma/PycharmProjects/cassava")
+#         repo.git.diff("HEAD")
+#         repo.git.add(".")
+#         repo.index.commit(f"{rand}(before running)")
+#         func(*args, **kwargs)
+#
+#         repo.index.commit(f"{rand}(after running)")
+#         repo.git.push('origin', 'master')
+#
+#     return wrapper
 
 
 def kaggle_wrapper(func):

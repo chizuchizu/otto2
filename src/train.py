@@ -1,4 +1,4 @@
-from sklearn.model_selection import KFold
+from sklearn.model_selection import StratifiedKFold
 import matplotlib.pyplot as plt
 
 import numpy as np
@@ -26,6 +26,7 @@ def save_log(score_dict):
     mlflow.log_artifact("features.csv")
 
 
+@git_commits(rand)
 def run(cfg):
     cwd = Path(hydra.utils.get_original_cwd())
 
@@ -36,17 +37,16 @@ def run(cfg):
 
     data = [pd.read_pickle(cwd / f"../features/{f}.pkl") for f in cfg.features]
     data = pd.concat(data, axis=1)
-
+    target = data.loc[data["train"], "target"].astype(int)
     train = data[data["train"]].drop(columns="train")
     test = data[~data["train"]].drop(columns=["train", "target"])
-    target = train["target"]
     train = train.drop(columns="target")
 
     del data
     gc.collect()
-    kfold = KFold(n_splits=cfg.base.n_folds, shuffle=True, random_state=cfg.base.seed)
+    kfold = StratifiedKFold(n_splits=cfg.base.n_folds, shuffle=True, random_state=cfg.base.seed)
 
-    pred = np.zeros(test.shape[0])
+    pred = np.zeros((test.shape[0], cfg.parameters.num_class))
     score = 0
 
     experiment_name = f"{'optuna_' if cfg.base.optuna else ''}{rand}"
@@ -85,7 +85,7 @@ def run(cfg):
 
             print(fold + 1, "done")
 
-            score_ = estimator.best_score["valid_1"][cfg.base.metric]
+            score_ = estimator.best_score["valid_1"][cfg.parameters.metric]
             score += score_ / cfg.base.n_folds
 
             save_log(
@@ -95,8 +95,11 @@ def run(cfg):
             )
 
 
-@git_commits(rand)
-@hydra.main(config_name="../config/training.yaml")
+# @git_commits(rand)
+@hydra.main(config_name="../config/config.yaml")
 def main(cfg):
     run(cfg)
     return None
+
+
+main()
