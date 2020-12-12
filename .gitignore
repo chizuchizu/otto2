@@ -1,0 +1,4 @@
+/data/
+/features/*.pkl
+/src/outputs/
+/src/mlruns/
