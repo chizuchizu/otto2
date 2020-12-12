@@ -5,26 +5,41 @@ import pandas as pd
 import hydra
 import numpy as np
 from sklearn.model_selection import KFold
+from sklearn.decomposition import PCA
 
-Feature.dir = "../features_data"
+Feature.dir = "features"
 data = base_data()
-
-groupby_cols = ["shipment_mode", "weekday", "drop_off_point", "shipping_company", "hour", "destination_country",
-                "shipment_id"]
-calc_cols = ["freight_cost", "gross_weight", "shipment_charges", "cost"]
 
 
 class Base_data(Feature):
     def create_features(self):
-        self.data = data.drop(columns=["processing_days", "cut_off_time"])
+        self.data = data.drop(columns=["train", "target"])
         create_memo("base_data", "初期")
 
 
+class Pca(Feature):
+    def create_features(self):
+        n = 20
+        pca = PCA(n_components=n)
+        pca.fit(
+            data.drop(
+                columns=["train", "target"]
+            )
+        )
+        n_name = [f"pca_{i}" for i in range(n)]
+        df_pca = pd.DataFrame(
+            pca.transform(data.drop(
+                columns=["train", "target"]
+            )),
+            columns=n_name
+        )
+        self.data = df_pca.copy()
+        create_memo("pca", "pcaかけただけ")
 
 
-@hydra.main(config_name="../config/features.yaml")
+@hydra.main(config_name="../config/config.yaml")
 def run(cfg):
-    generate_features(globals(), cfg.overwrite)
+    generate_features(globals(), cfg.base.overwrite)
 
 
 # デバッグ用
