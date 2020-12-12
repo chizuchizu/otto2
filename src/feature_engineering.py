@@ -23,13 +23,13 @@ class Pca(Feature):
         pca = PCA(n_components=n)
         pca.fit(
             data.drop(
-                columns=["train", "target"]
+                columns=["train", "target", "id"]
             )
         )
         n_name = [f"pca_{i}" for i in range(n)]
         df_pca = pd.DataFrame(
             pca.transform(data.drop(
-                columns=["train", "target"]
+                columns=["train", "target", "id"]
             )),
             columns=n_name
         )

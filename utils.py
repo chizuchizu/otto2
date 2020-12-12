@@ -135,7 +135,7 @@ def git_commits(rand):
         # print('--- my_decorator before decorator_wrapper ---')
         print("experiment_name: ", rand)
 
-        repo = git.Repo("/home/yuma/PycharmProjects/cassava")
+        repo = git.Repo(str(Path(os.getcwd()).parents[0]))
         repo.git.diff("HEAD")
         repo.git.add(".")
         repo.index.commit(f"{rand}(before running)")
@@ -154,31 +154,6 @@ def git_commits(rand):
         return decorator_wrapper
 
     return func_decorator
-
-
-# def git_commits(rand):
-#     repo = git.Repo("/home/yuma/PycharmProjects/cassava")
-#     repo.git.diff("HEAD")
-#     repo.git.add(".")
-#     repo.index.commit(f"{rand}(before running)")
-#
-#     repo.index.commit(f"{rand}(after running)")
-#     repo.git.push('origin', 'master')
-
-
-# def git_commits(func):
-#     def wrapper(*args, **kwargs):
-#         rand = args[0]
-#         repo = git.Repo("/home/yuma/PycharmProjects/cassava")
-#         repo.git.diff("HEAD")
-#         repo.git.add(".")
-#         repo.index.commit(f"{rand}(before running)")
-#         func(*args, **kwargs)
-#
-#         repo.index.commit(f"{rand}(after running)")
-#         repo.git.push('origin', 'master')
-#
-#     return wrapper
 
 
 def kaggle_wrapper(func):

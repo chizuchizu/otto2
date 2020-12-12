@@ -6,6 +6,7 @@ import pandas as pd
 import shap
 import hydra
 import gc
+import os
 
 from pathlib import Path
 
@@ -22,7 +23,7 @@ def save_log(score_dict):
     mlflow.log_artifact(".hydra/config.yaml")
     mlflow.log_artifact(".hydra/hydra.yaml")
     mlflow.log_artifact(".hydra/overrides.yaml")
-    mlflow.log_artifact("train_hydra.log")
+    mlflow.log_artifact(f"{os.path.basename(__file__)[:-3]}.log")
     mlflow.log_artifact("features.csv")
 
 
@@ -93,6 +94,14 @@ def run(cfg):
                     "score": score
                 }
             )
+
+    ss = pd.read_csv(cwd / "../data/sampleSubmission.csv")
+    ss.iloc[:, 1:] = pred
+    file_path = cwd / f"../outputs/{rand}.csv"
+    ss.to_csv(file_path, index=False)
+
+    mlflow.log_artifact(file_path)
+    os.system("kaggle competitions submit -c otto-group-product-classification-challenge -f submission.csv -m 'none'")
 
 
 # @git_commits(rand)
